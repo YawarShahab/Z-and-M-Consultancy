@@ -79,10 +79,7 @@ const ProgramCard = React.memo(({ program }: { program: ReturnType<typeof getLar
 
 ProgramCard.displayName = "ProgramCard";
 
-
-/* ---------------- MAIN CONTENT ---------------- */
-
-function ProgramsPageContent() {
+function ProgramsContent() {
   const searchParams = useSearchParams();
   const countryParam = searchParams.get("country");
 
@@ -146,7 +143,6 @@ function ProgramsPageContent() {
   }, [debouncedSearchQuery, allPrograms, selectedCountry, selectedUniversity, selectedStudyLevel, selectedDuration]);
 
   const totalPages = Math.ceil(filteredPrograms.length / ITEMS_PER_PAGE);
-
   const paginatedPrograms = useMemo(() => {
     return filteredPrograms.slice(
       (currentPage - 1) * ITEMS_PER_PAGE,
@@ -178,21 +174,195 @@ function ProgramsPageContent() {
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-zinc-950">
       <Navbar />
+      
+      <main className="flex-grow pt-24 pb-16 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="mb-12">
+            <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl mb-4">
+              {selectedCountry !== "all" ? `Programs in ${selectedCountry}` : "All Programs"}
+            </h1>
+            <p className="text-lg text-zinc-600 dark:text-zinc-400">
+              Discover over 35,000+ programs from top universities worldwide.
+            </p>
+          </div>
 
-      {/* --- YOUR FULL UI CODE REMAINS EXACTLY THE SAME HERE --- */}
+          <div className="flex flex-col md:flex-row gap-4 mb-8">
+            <div className="relative flex-grow">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
+              <Input
+                placeholder="Search by course, university, or country..."
+                className="pl-10 h-12 rounded-xl border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50"
+                value={searchQuery}
+                onChange={handleSearch}
+              />
+            </div>
+            
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 gap-2 relative"
+                >
+                  <SlidersHorizontal className="h-5 w-5" />
+                  Filters
+                  {activeFiltersCount > 0 && (
+                    <Badge className="ml-1 bg-indigo-600 text-white border-none h-5 min-w-5 flex items-center justify-center p-0 text-[10px]">
+                      {activeFiltersCount}
+                    </Badge>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="w-[300px] sm:w-[400px]">
+                <SheetHeader>
+                  <SheetTitle className="text-2xl font-bold">Filters</SheetTitle>
+                </SheetHeader>
+                <div className="py-8 space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-500 uppercase tracking-wider">Country</label>
+                    <Select value={selectedCountry} onValueChange={(val) => { setSelectedCountry(val); setCurrentPage(1); }}>
+                      <SelectTrigger className="w-full h-11 rounded-xl">
+                        <SelectValue placeholder="Select Country" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {countries.map(c => (
+                          <SelectItem key={c} value={c}>{c === "all" ? "All Countries" : c}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-500 uppercase tracking-wider">University</label>
+                    <Select value={selectedUniversity} onValueChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}>
+                      <SelectTrigger className="w-full h-11 rounded-xl">
+                        <SelectValue placeholder="Select University" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {universities.map(u => (
+                          <SelectItem key={u} value={u}>{u === "all" ? "All Universities" : u}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-500 uppercase tracking-wider">Study Level</label>
+                    <Select value={selectedStudyLevel} onValueChange={(val) => { setSelectedStudyLevel(val); setCurrentPage(1); }}>
+                      <SelectTrigger className="w-full h-11 rounded-xl">
+                        <SelectValue placeholder="Select Level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {studyLevels.map(l => (
+                          <SelectItem key={l} value={l}>{l === "all" ? "All Levels" : l}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-500 uppercase tracking-wider">Duration</label>
+                    <Select value={selectedDuration} onValueChange={(val) => { setSelectedDuration(val); setCurrentPage(1); }}>
+                      <SelectTrigger className="w-full h-11 rounded-xl">
+                        <SelectValue placeholder="Select Duration" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {durations.map(d => (
+                          <SelectItem key={d} value={d}>{d === "all" ? "All Durations" : d}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Button 
+                    variant="ghost" 
+                    className="w-full text-zinc-500 hover:text-red-500 gap-2"
+                    onClick={clearFilters}
+                  >
+                    <X className="h-4 w-4" />
+                    Clear All Filters
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          <div className="mb-6 flex items-center justify-between text-sm text-zinc-500">
+            <span>Showing {Math.min(filteredPrograms.length, 1)}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredPrograms.length)} of {filteredPrograms.length.toLocaleString()} results</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {paginatedPrograms.map((program) => (
+              <ProgramCard key={program.id} program={program} />
+            ))}
+          </div>
+
+          {filteredPrograms.length === 0 && (
+            <div className="text-center py-24">
+              <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">No programs found</h3>
+              <p className="text-zinc-500 mt-2">Try adjusting your search query or filters.</p>
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="rounded-xl border-zinc-200 dark:border-zinc-800"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) pageNum = i + 1;
+                  else if (currentPage <= 3) pageNum = i + 1;
+                  else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+                  else pageNum = currentPage - 2 + i;
+
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`w-10 h-10 rounded-xl ${
+                        currentPage === pageNum 
+                          ? "bg-indigo-600 hover:bg-indigo-700" 
+                          : "border-zinc-200 dark:border-zinc-800"
+                      }`}
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+              </div>
+
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="rounded-xl border-zinc-200 dark:border-zinc-800"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+            </div>
+          )}
+        </div>
+      </main>
 
       <Footer />
     </div>
   );
 }
 
-
-/* ---------------- SUSPENSE WRAPPER ---------------- */
-
 export default function ProgramsPage() {
   return (
-    <Suspense fallback={<div className="p-20 text-center">Loading programs...</div>}>
-      <ProgramsPageContent />
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" /></div>}>
+      <ProgramsContent />
     </Suspense>
   );
 }

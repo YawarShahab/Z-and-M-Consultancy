@@ -119,9 +119,11 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
                 </div>
 
                 <div className="mt-10">
-                  <Button className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 rounded-xl font-bold">
-                    Apply Now
-                  </Button>
+                  <Link href="/#contact">
+                    <Button className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 rounded-xl font-bold">
+                      Apply Now
+                    </Button>
+                  </Link>
                 </div>
 
                 <p className="text-center text-xs text-zinc-500 mt-6">

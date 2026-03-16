@@ -77,7 +77,7 @@ export function Footer() {
 
         <div className="border-t border-zinc-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-zinc-500">
-            © {new Date().getFullYear()} Z and M Consultancy Consultancy. All rights reserved.
+            © {new Date().getFullYear()} Z and M Consultancy. All rights reserved.
           </p>
           <div className="flex gap-8">
             <Link href="#" className="text-sm text-zinc-500 hover:text-white">Privacy Policy</Link>
